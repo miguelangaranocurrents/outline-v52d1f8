@@ -82,8 +82,9 @@ function PinnedDocuments({
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        delay: 100,
-        tolerance: 5,
+        // Only start dragging once the pointer moves, so that a click held
+        // in place still opens the document.
+        distance: 5,
       },
     }),
     useSensor(KeyboardSensor, {

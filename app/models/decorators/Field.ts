@@ -1,6 +1,9 @@
 import type Model from "../base/Model";
 
-const fields = new Map<string, (string | number | symbol)[]>();
+// Keyed by the class itself rather than its name: class names are mangled by
+// minification and are not guaranteed to be unique across models.
+// oxlint-disable-next-line @typescript-eslint/no-unsafe-function-type
+const fields = new Map<Function, (string | number | symbol)[]>();
 
 /**
  * Returns the keys recorded as serializable fields on a model.
@@ -17,8 +20,9 @@ export const getFieldsForModel = <T extends Model>(target: T) =>
  * @param model the model class to inspect.
  * @returns the keys decorated with @Field.
  */
-export function getFieldsForModelClass(model: { name: string }) {
-  return fields.get(model.name) ?? [];
+// oxlint-disable-next-line @typescript-eslint/no-unsafe-function-type
+export function getFieldsForModelClass(model: Function) {
+  return fields.get(model) ?? [];
 }
 
 /**
@@ -29,8 +33,8 @@ export function getFieldsForModelClass(model: { name: string }) {
  * @param propertyKey the key to record as a field.
  */
 const Field = (target: Model, propertyKey: string | symbol) => {
-  const className = target.constructor.name;
-  fields.set(className, [...(fields.get(className) ?? []), propertyKey]);
+  const modelClass = target.constructor;
+  fields.set(modelClass, [...(fields.get(modelClass) ?? []), propertyKey]);
 };
 
 export default Field;
